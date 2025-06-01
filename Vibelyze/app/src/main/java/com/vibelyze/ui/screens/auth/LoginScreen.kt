@@ -23,11 +23,20 @@ import com.vibelyze.R
 import androidx.compose.material3.*
 
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+
+
+
+
 @Composable
 fun LoginScreen(
+    navController: NavController,
     onLoginClick: () -> Unit = {},
-    onCreateAccountClick: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
+    onForgotPasswordClick: () -> Unit = {},
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -46,6 +55,8 @@ fun LoginScreen(
                 contentDescription = "Logo",
                 modifier = Modifier.size(120.dp)
             )
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -119,7 +130,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = onCreateAccountClick,
+                onClick = { navController.navigate("signup") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
             ) {

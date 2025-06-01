@@ -40,6 +40,12 @@ android {
 }
 
 dependencies {
+
+    implementation("androidx.navigation:navigation-compose:2.7.5") // o la última versión
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // o la que uses
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.compose.material3:material3:1.1.2")
+
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
