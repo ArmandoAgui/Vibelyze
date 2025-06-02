@@ -19,11 +19,12 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material3.TextFieldDefaults
 import com.vibelyze.R
 import androidx.compose.material3.*
+import androidx.navigation.NavController
 
 
 @Composable
 fun SignUpScreen(
-    onSignUpClick: () -> Unit = {},
+    navController: NavController,
     onCreateAccountClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {}
 ) {
@@ -101,13 +102,10 @@ fun SignUpScreen(
                 }
             )
 
-
-
             Spacer(modifier = Modifier.height(24.dp))
-
-
+            
             Button(
-                onClick = onSignUpClick,
+                onClick = { navController.navigate("passwordScreen") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -133,7 +131,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = onCreateAccountClick,
+                onClick = { onCreateAccountClick },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
             ) {
@@ -232,7 +230,7 @@ fun FechaDeNacimientoSelector(
                 expanded = expandedMonth,
                 onExpandedChange = { expandedMonth = !expandedMonth },
                 modifier = Modifier
-                    .weight(1f) // Aumentamos el ancho para el mes
+                    .weight(1f)
                     .padding(horizontal = 4.dp)
             ) {
                 OutlinedTextField(

@@ -30,14 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
 
+
+
 @Composable
-fun LoginScreen(
+fun ConfirmPasswordScreen(
     navController: NavController,
     onLoginClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
 ) {
-    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Box(
         modifier = Modifier
@@ -67,9 +69,9 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo electrónico", color = Color.White) },
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -84,9 +86,9 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña", color = Color.White) },
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirmar Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -111,7 +113,7 @@ fun LoginScreen(
                     contentColor = Color.Black
                 )
             ) {
-                Text("Iniciar Sesion")
+                Text("Crear Cuenta")
             }
 
             Spacer(modifier = Modifier.height(8.dp))

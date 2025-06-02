@@ -25,6 +25,7 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.vibelyze.ui.screens.auth.ConfirmPasswordScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -39,7 +40,10 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(navController)
                     }
                     composable("signup") {
-                        SignUpScreen()
+                        SignUpScreen(navController)
+                    }
+                    composable("passwordScreen") {
+                        ConfirmPasswordScreen(navController)
                     }
                 }
             }
