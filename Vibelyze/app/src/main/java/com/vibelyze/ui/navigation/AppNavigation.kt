@@ -13,6 +13,7 @@ import com.vibelyze.ui.onboarding.OnboardingScreen
 import com.vibelyze.ui.onboarding.OnboardingViewModel
 import com.vibelyze.ui.playlist.PlaylistScreen
 import com.vibelyze.ui.playlist.PlaylistViewModel
+import com.vibelyze.ui.playsong.PlaySongScreen
 import com.vibelyze.ui.saved.SavedScreen
 
 @Composable
@@ -31,7 +32,11 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
         composable(Screen.Login.route) {
-            LoginScreen()
+            //LoginScreen()
+        }
+        composable(Screen.Song.route) { backStackEntry ->
+            val emotion = backStackEntry.arguments?.getString( "emotion") ?:  ""
+            PlaySongScreen(emotion)
         }
     }
 }

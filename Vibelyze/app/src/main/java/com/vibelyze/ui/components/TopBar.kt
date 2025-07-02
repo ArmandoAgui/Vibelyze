@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -32,8 +33,11 @@ fun TopBarMenu(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF1B1F3B))
-
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF1B1F3B), Color(0xFF0B0F2F))
+                )
+            )
     ) {
         Row(
             modifier = Modifier
@@ -43,17 +47,17 @@ fun TopBarMenu(
             verticalAlignment = Alignment.CenterVertically
         ){
             TopBarItem(
-                icon = painterResource(id = R.drawable.ic_listened),
+                icon = painterResource(id = R.drawable.ic_horizontal_video),
                 label = "Escuchados",
                 onClick = onListenedClick
             )
             TopBarItem(
-                icon = painterResource(id = R.drawable.ic_saved),
+                icon = painterResource(id = R.drawable.ic_music_library),
                 label = "Guardados",
                 onClick = onSavedClick
             )
             TopBarItem(
-                icon = painterResource(id = R.drawable.ic_exit),
+                icon = painterResource(id = R.drawable.ic_logout),
                 label = "Salir",
                 onClick = onExitClick
             )
