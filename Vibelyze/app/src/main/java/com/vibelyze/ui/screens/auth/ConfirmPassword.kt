@@ -109,12 +109,8 @@ fun ConfirmPasswordScreen(
                                     popUpTo("signup") { inclusive = true }
                                     launchSingleTop = true
                                 }
-
-                                navController.navigate("homeScreen") {
-                                    popUpTo("signup") { inclusive = true }
-                                    launchSingleTop = true
-                                }
-
+                                    // Aqui borre lo mismo de arriba, vere si funciona sin esto y de paso se lo pondre en LoginScreen
+                                    //para ver si manda a otra pantalla habiendose logueado
                             }
                         }
                         .addOnFailureListener { e ->
@@ -158,6 +154,7 @@ fun ConfirmPasswordScreen(
                 label = { Text("Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(), // hacer commit de esto pero verificar si funciona
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF1F1F1F),
                     unfocusedContainerColor = Color(0xFF1F1F1F),
@@ -175,6 +172,7 @@ fun ConfirmPasswordScreen(
                 label = { Text("Confirmar Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(), // hacer commit de esto pero verificar si funciona
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF1F1F1F),
                     unfocusedContainerColor = Color(0xFF1F1F1F),

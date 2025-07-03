@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+
+//Solo es una pantalla quemada para verofocar si funciona la validacion de credenciales
 @Composable
 fun HomeScreen(navController: NavController) {
     Box(

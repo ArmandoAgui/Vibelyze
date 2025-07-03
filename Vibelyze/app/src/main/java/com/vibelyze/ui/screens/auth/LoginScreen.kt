@@ -92,6 +92,7 @@ fun LoginScreen(
                 label = { Text("Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
+                visualTransformation = PasswordVisualTransformation(), // hacer commit de esto pero verificar si funciona
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF1F1F1F),
                     unfocusedContainerColor = Color(0xFF1F1F1F),
@@ -112,7 +113,11 @@ fun LoginScreen(
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                                onLoginClick() // Aquí navegas a la siguiente pantalla si el login fue exitoso
+                                //onLoginClick() // Aquí navegas a la siguiente pantalla si el login fue exitoso
+                                navController.navigate("homeScreen") {
+                                    popUpTo("signup") { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             } else {
                                 Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                             }
