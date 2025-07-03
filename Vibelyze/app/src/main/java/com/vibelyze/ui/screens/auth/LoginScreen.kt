@@ -24,7 +24,6 @@ import androidx.compose.material3.TextFieldDefaults
 import com.vibelyze.R
 import androidx.compose.material3.*
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,9 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-
 import androidx.compose.ui.platform.LocalContext
-
 
 @Composable
 fun LoginScreen(
@@ -104,7 +101,6 @@ fun LoginScreen(
                 )
             )
 
-
             Spacer(modifier = Modifier.height(24.dp))
 
             val context = LocalContext.current
@@ -132,7 +128,6 @@ fun LoginScreen(
             ) {
                 Text("Iniciar Sesión")
             }
-
 
             Spacer(modifier = Modifier.height(8.dp))
 

@@ -141,24 +141,6 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "¿Se ha olvidado de su contraseña?",
-                color = Color.White,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .clickable { onForgotPasswordClick() }
-                    .padding(vertical = 8.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedButton(
-                onClick = { onCreateAccountClick() },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-            ) {
-                Text("Crear Cuenta")
-            }
         }
     }
 }
@@ -184,7 +166,6 @@ fun FechaDeNacimientoSelector(
 
     var (selectedDay, selectedMonth, selectedYear) = selectedDate
 
-
     var expandedDay by remember { mutableStateOf(false) }
     var expandedMonth by remember { mutableStateOf(false) }
     var expandedYear by remember { mutableStateOf(false) }
@@ -200,7 +181,6 @@ fun FechaDeNacimientoSelector(
         focusedTextColor = Color.White,
         unfocusedTextColor = Color.White
     )
-
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(

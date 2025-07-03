@@ -103,14 +103,12 @@ fun ConfirmPasswordScreen(
                     firestore.collection("users").document(uid)
                         .set(userMap)
                         .addOnSuccessListener {
-                            // ✅ Este bloque se ejecuta después de guardar en Firestore
                             Handler(Looper.getMainLooper()).post {
                                 Toast.makeText(context, "Cuenta creada exitosamente", Toast.LENGTH_SHORT).show()
                                 navController.navigate("homeScreen") {
                                     popUpTo("signup") { inclusive = true }
                                     launchSingleTop = true
                                 }
-
 
                                 navController.navigate("homeScreen") {
                                     popUpTo("signup") { inclusive = true }
@@ -128,7 +126,6 @@ fun ConfirmPasswordScreen(
                 }
             }
     }
-
 
     Box(
         modifier = Modifier
@@ -207,17 +204,6 @@ fun ConfirmPasswordScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = it, color = Color.Red)
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "¿Se ha olvidado de su contraseña?",
-                color = Color.White,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .clickable { onForgotPasswordClick() }
-                    .padding(vertical = 8.dp)
-            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
