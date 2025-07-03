@@ -1,5 +1,6 @@
 package com.vibelyze.ui.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,8 +27,12 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+
+import androidx.compose.ui.platform.LocalContext
 
 
 @Composable
@@ -101,8 +106,21 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            val context = LocalContext.current
+            val auth = FirebaseAuth.getInstance()
+
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+                                onLoginClick() // Aquí navegas a la siguiente pantalla si el login fue exitoso
+                            } else {
+                                Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -111,8 +129,9 @@ fun LoginScreen(
                     contentColor = Color.Black
                 )
             ) {
-                Text("Iniciar Sesion")
+                Text("Iniciar Sesión")
             }
+
 
             Spacer(modifier = Modifier.height(8.dp))
 

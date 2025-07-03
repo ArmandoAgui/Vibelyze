@@ -1,5 +1,6 @@
 package com.vibelyze.ui.screens.auth
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,19 +21,23 @@ import androidx.compose.material3.TextFieldDefaults
 import com.vibelyze.R
 import androidx.compose.material3.*
 import androidx.navigation.NavController
-
+import androidx.lifecycle.ViewModel
 
 @Composable
 fun SignUpScreen(
     navController: NavController,
     onCreateAccountClick: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
+    onForgotPasswordClick: () -> Unit = {},
+    viewModel: SignUpViewModel
 ) {
-    var email by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
-
-    var selectedDate by remember { mutableStateOf(Triple("01", "Enero", "2025")) }
-
+    var email by remember { mutableStateOf(viewModel.email) }
+    var name by remember { mutableStateOf(viewModel.name) }
+    var selectedDate by remember { mutableStateOf(
+        viewModel.birthDate.takeIf { it.isNotEmpty() }?.let {
+            val parts = it.split(" ")
+            if(parts.size == 3) Triple(parts[0], parts[1], parts[2]) else Triple("01", "Enero", "2025")
+        } ?: Triple("01", "Enero", "2025")
+    ) }
 
     Box(
         modifier = Modifier
@@ -53,7 +58,8 @@ fun SignUpScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { email = it
+                                viewModel.email = it },
                 label = { Text("Correo electrónico", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
@@ -70,7 +76,8 @@ fun SignUpScreen(
 
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = { name = it
+                                viewModel.name = it },
                 label = { Text("Nombre", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
@@ -87,7 +94,10 @@ fun SignUpScreen(
 
             FechaDeNacimientoSelector(
                 selectedDate = selectedDate,
-                onDateSelected = { selectedDate = it },
+                onDateSelected = {
+                    selectedDate = it
+                    viewModel.birthDate = "${it.first} ${it.second} ${it.third}"
+                },
                 selectedDay = selectedDate.first,
                 selectedMonth = selectedDate.second,
                 selectedYear = selectedDate.third,
@@ -103,9 +113,21 @@ fun SignUpScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             Button(
-                onClick = { navController.navigate("passwordScreen") },
+                onClick = {
+
+                    if(email.isBlank() || name.isBlank()) {
+                        // Aquí podrías mostrar un mensaje de error (Snackbar o Toast)
+                        return@Button
+                    }
+
+                    if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        // Mostrar mensaje de error aquí también
+                        return@Button
+                    }
+                    navController.navigate("confirmPasswordScreen") // Navegar a pantalla para contraseña
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -131,7 +153,7 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedButton(
-                onClick = { onCreateAccountClick },
+                onClick = { onCreateAccountClick() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
             ) {
