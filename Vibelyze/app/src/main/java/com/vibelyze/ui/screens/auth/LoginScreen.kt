@@ -1,5 +1,6 @@
 package com.vibelyze.ui.screens.auth
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +44,8 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
 
     Box(
         modifier = Modifier
@@ -58,8 +61,6 @@ fun LoginScreen(
                 contentDescription = "Logo",
                 modifier = Modifier.size(120.dp)
             )
-
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -140,7 +141,22 @@ fun LoginScreen(
                 color = Color.White,
                 fontSize = 14.sp,
                 modifier = Modifier
-                    .clickable { onForgotPasswordClick() }
+                    .clickable {
+                        if (email.isBlank()) {
+                            Toast.makeText(context, "Ingrese su correo para restablecer la contraseña", Toast.LENGTH_SHORT).show()
+                        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            Toast.makeText(context, "Correo electrónico no válido", Toast.LENGTH_SHORT).show()
+                        } else {
+                            auth.sendPasswordResetEmail(email)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        Toast.makeText(context, "Correo enviado para restablecer la contraseña", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                        }
+                    }
                     .padding(vertical = 8.dp)
             )
 
