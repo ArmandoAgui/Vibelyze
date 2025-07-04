@@ -49,7 +49,7 @@ fun SignUpScreen(
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logo2),
                 contentDescription = "Logo",
                 modifier = Modifier.size(120.dp)
             )

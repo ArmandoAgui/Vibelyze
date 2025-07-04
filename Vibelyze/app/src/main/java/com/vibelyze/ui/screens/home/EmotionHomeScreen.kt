@@ -26,6 +26,9 @@ import com.vibelyze.ui.theme.PurpleGrey40
 import com.vibelyze.viewmodel.EmotionMusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vibelyze.ui.screens.playlist.AddToPlaylistDialog
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
+import com.vibelyze.R
 
 @Composable
 fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
@@ -178,8 +181,8 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                AsyncImage(
-                    model = imageUrl,
+                Image(
+                    painter = painterResource(id = R.drawable.album),
                     contentDescription = "Portada del track",
                     modifier = Modifier
                         .size(180.dp)
