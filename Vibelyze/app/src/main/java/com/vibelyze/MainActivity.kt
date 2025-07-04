@@ -19,6 +19,7 @@ import androidx.activity.viewModels
 import com.google.firebase.FirebaseApp
 import com.vibelyze.ui.screens.auth.HomeScreen
 import com.vibelyze.ui.screens.auth.SignUpViewModel
+import com.vibelyze.ui.screens.home.EmotionHomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,32 +27,13 @@ class MainActivity : ComponentActivity() {
 
         FirebaseApp.initializeApp(this)
 
-        val signUpViewModel: SignUpViewModel by viewModels()
-
         setContent {
             VibelyzeTheme {
-                Surface(
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    val navController = rememberNavController()
-
-                    NavHost(navController = navController, startDestination = "login") {
-                        composable("login") {
-                            LoginScreen(navController)
-                        }
-                        composable("signup") {
-                            SignUpScreen(navController = navController, viewModel = signUpViewModel)
-                        }
-                        composable("confirmPasswordScreen") {
-                            ConfirmPasswordScreen(navController = navController, viewModel = signUpViewModel)
-                        }
-                        composable("homeScreen") {
-                            HomeScreen(navController)
-                        }
-                    }
-
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    EmotionHomeScreen() // 👈 Aquí lo cargas directamente
                 }
             }
         }
     }
 }
+
