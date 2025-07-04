@@ -11,4 +11,6 @@ object NavRoutes {
     const val Emotion = "emotion"
     const val Playlists = "playlists"
     const val Profile = "profile"
+
+    const val PlaylistDetail = "playlistDetail/{playlistId}/{playlistName}"
 }
