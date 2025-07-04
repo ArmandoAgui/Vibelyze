@@ -53,6 +53,11 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
     implementation("com.google.firebase:firebase-common-ktx:20.4.0")
 
+    // Retrofit y Gson
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("com.google.code.gson:gson:2.10.1")
 
 
     implementation(libs.androidx.compose.material3)
