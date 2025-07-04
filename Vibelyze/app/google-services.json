@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "83295088418",
+    "project_id": "vibelyze-47599",
+    "storage_bucket": "vibelyze-47599.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83295088418:android:238dd10f550888b2017f7b",
+        "android_client_info": {
+          "package_name": "com.vibelyze"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO02bSdNZYzMq3MDN10OUD-Vml80ah_ZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
