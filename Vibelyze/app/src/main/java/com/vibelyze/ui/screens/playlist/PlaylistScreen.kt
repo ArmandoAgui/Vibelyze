@@ -3,7 +3,7 @@ package com.vibelyze.ui.screens.playlist
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,8 +44,10 @@ fun PlaylistScreen(
     var playlists by remember { mutableStateOf<List<Playlist>>(emptyList()) }
     var showDialog by remember { mutableStateOf(false) }
     var newPlaylistName by remember { mutableStateOf("") }
+    var selectedPlaylist by remember { mutableStateOf<Playlist?>(null) }
+    var showOptionsDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
 
-    // 🔁 Escuchar playlists
     LaunchedEffect(userId) {
         if (userId != null) {
             firestore.collection("users").document(userId)
@@ -79,28 +82,32 @@ fun PlaylistScreen(
                 Text("Aún no tienes playlists", color = Color.White)
             } else {
                 LazyColumn {
-                    items(playlists) { playlist -> // ✅ Esto es correcto
+                    items(playlists) { playlist ->
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 6.dp)
-                                .clickable {
-                                    val encodedName = java.net.URLEncoder.encode(playlist.name, "UTF-8").replace("+", "%20")
-
-                                    Log.d("DEBUG_NAV", "Navigating to: playlistDetail/${playlist.id}/$encodedName")
-
-                                    navController.navigate(
-                                        NavRoutes.PlaylistDetail
-                                            .replace("{playlistId}", playlist.id)
-                                            .replace("{playlistName}", encodedName)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            val encodedName = java.net.URLEncoder.encode(playlist.name, "UTF-8").replace("+", "%20")
+                                            Log.d("DEBUG_NAV", "Navigating to: playlistDetail/${playlist.id}/$encodedName")
+                                            navController.navigate(
+                                                NavRoutes.PlaylistDetail
+                                                    .replace("{playlistId}", playlist.id)
+                                                    .replace("{playlistName}", encodedName)
+                                            )
+                                        },
+                                        onLongPress = {
+                                            selectedPlaylist = playlist
+                                            showOptionsDialog = true
+                                        }
                                     )
-
-                                }
-                            ,
+                                },
                             colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
                         ) {
                             Text(
-                                text = playlist.name, // ✅ Aquí ahora sí es String
+                                text = playlist.name,
                                 color = Color.White,
                                 fontSize = 18.sp,
                                 modifier = Modifier.padding(16.dp)
@@ -108,8 +115,6 @@ fun PlaylistScreen(
                         }
                     }
                 }
-
-
             }
         }
 
@@ -170,6 +175,81 @@ fun PlaylistScreen(
                 containerColor = Color(0xFF1F1F1F)
             )
         }
+
+        if (showOptionsDialog && selectedPlaylist != null) {
+            AlertDialog(
+                onDismissRequest = { showOptionsDialog = false },
+                title = { Text("Opciones para \"${selectedPlaylist!!.name}\"", color = Purple80) },
+                text = { Text("¿Qué deseas hacer con esta playlist?", color = Color.White) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showOptionsDialog = false
+                        showEditDialog = true
+                    }) {
+                        Text("✏️ Editar", color = Purple80)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        if (userId != null) {
+                            firestore.collection("users").document(userId)
+                                .collection("playlists").document(selectedPlaylist!!.id)
+                                .delete()
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Playlist eliminada", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        showOptionsDialog = false
+                    }) {
+                        Text("🗑️ Eliminar", color = Color.Red)
+                    }
+                },
+                containerColor = Color(0xFF1F1F1F)
+            )
+        }
+
+        if (showEditDialog && selectedPlaylist != null) {
+            var newName by remember { mutableStateOf(selectedPlaylist!!.name) }
+
+            AlertDialog(
+                onDismissRequest = { showEditDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        if (userId != null) {
+                            firestore.collection("users").document(userId)
+                                .collection("playlists").document(selectedPlaylist!!.id)
+                                .update("name", newName)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Playlist actualizada", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        showEditDialog = false
+                    }) {
+                        Text("Guardar", color = Purple80)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showEditDialog = false }) {
+                        Text("Cancelar", color = Color.Gray)
+                    }
+                },
+                title = { Text("Editar nombre", color = Purple80) },
+                text = {
+                    OutlinedTextField(
+                        value = newName,
+                        onValueChange = { newName = it },
+                        label = { Text("Nuevo nombre", color = Color.White) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFF2C2C2C),
+                            unfocusedContainerColor = Color(0xFF2C2C2C),
+                            focusedIndicatorColor = Purple80,
+                            unfocusedIndicatorColor = Color.Gray,
+                            cursorColor = Color.White
+                        )
+                    )
+                },
+                containerColor = Color(0xFF1F1F1F)
+            )
+        }
     }
 }
-
