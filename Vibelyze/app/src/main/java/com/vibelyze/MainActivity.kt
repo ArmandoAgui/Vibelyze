@@ -1,29 +1,32 @@
 package com.vibelyze
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
+import androidx.activity.viewModels
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.navigation.compose.rememberNavController
-import com.vibelyze.ui.navigation.AppNavigation
+import com.google.firebase.FirebaseApp
+import com.vibelyze.ui.navigation.AppNavGraph
 import com.vibelyze.ui.theme.VibelyzeTheme
+import com.vibelyze.ui.screens.auth.SignUpViewModel
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        FirebaseApp.initializeApp(this)
+
+        val signUpViewModel: SignUpViewModel by viewModels()
+
         setContent {
             VibelyzeTheme {
-                val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) {
-                    AppNavigation(navController = navController)
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    val navController = rememberNavController()
+                    AppNavGraph(navController = navController, signUpViewModel = signUpViewModel)
                 }
             }
         }
     }
 }
+
