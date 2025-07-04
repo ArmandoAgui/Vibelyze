@@ -13,10 +13,11 @@ import com.vibelyze.ui.navigation.NavRoutes
 import com.vibelyze.ui.screens.home.EmotionHomeScreen
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
-
+import androidx.navigation.NavController
+import com.vibelyze.ui.screens.profile.ProfileScreen
 
 @Composable
-fun MainScreenWithBottomBar() {
+fun MainScreenWithBottomBar(mainNavController: NavController) {
     val bottomNavController = rememberNavController()
 
     val items = listOf(
@@ -57,14 +58,15 @@ fun MainScreenWithBottomBar() {
                 EmotionHomeScreen()
             }
             composable(NavRoutes.Playlists) {
-                Text("🎵 Pantalla de playlists") // Sustituye por tu pantalla real
+                Text("🎵 Pantalla de playlists")
             }
             composable(NavRoutes.Profile) {
-                Text("👤 Pantalla de perfil") // Sustituye por tu pantalla real
+                ProfileScreen(navController = mainNavController) // ✅ usamos el nav principal
             }
         }
     }
 }
+
 
 data class BottomBarItem(
     val label: String,

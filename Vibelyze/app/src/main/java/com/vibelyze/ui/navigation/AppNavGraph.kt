@@ -44,7 +44,7 @@ fun AppNavGraph(
         }
 
         composable(NavRoutes.Home) {
-            MainScreenWithBottomBar()
+            MainScreenWithBottomBar(mainNavController = navController)
         }
 
         composable(NavRoutes.Emotion) {
