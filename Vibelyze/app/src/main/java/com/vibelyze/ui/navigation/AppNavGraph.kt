@@ -9,7 +9,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.vibelyze.ui.screens.auth.*
 import com.vibelyze.ui.screens.home.EmotionHomeScreen
-import com.vibelyze.ui.components.MainBottomBarScreen
 import com.vibelyze.ui.screens.home.MainScreenWithBottomBar
 import com.vibelyze.ui.screens.playlist.PlaylistDetailScreen
 
