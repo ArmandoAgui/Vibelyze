@@ -8,11 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,9 +23,9 @@ import com.vibelyze.session.SessionManager
 import com.vibelyze.ui.theme.Purple40
 import com.vibelyze.ui.theme.Purple80
 import com.vibelyze.ui.theme.PurpleGrey40
-import com.vibelyze.utils.SearchLimiter
 import com.vibelyze.viewmodel.EmotionMusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vibelyze.ui.screens.playlist.AddToPlaylistDialog
 
 @Composable
 fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
@@ -39,6 +35,7 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
     val apiKey = "0ca85b42944c4f03c6bc396e685a3fb3"
 
     var showLimitDialog by remember { mutableStateOf(false) }
+    var selectedTrack by remember { mutableStateOf<Track?>(null) }
 
     val emotionTags = mapOf(
         "😀" to "happy", "😥" to "sad", "😡" to "angry", "😭" to "cry",
@@ -87,7 +84,7 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
         } else {
             tracks.firstOrNull()?.let { track ->
                 MusicPlayerCard(track) {
-                    println("🎵 Agregado a la playlist: ${track.name} - ${track.artist.name}")
+                    selectedTrack = track
                 }
             } ?: Text("No se encontró una canción", color = Color.White)
         }
@@ -114,9 +111,12 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
                 textContentColor = Color.White
             )
         }
+
+        selectedTrack?.let { track ->
+            AddToPlaylistDialog(track = track, onDismiss = { selectedTrack = null })
+        }
     }
 }
-
 
 fun checkAndHandleLimit(
     uid: String,
@@ -135,7 +135,6 @@ fun checkAndHandleLimit(
         val elapsed = now - lastTimestamp
 
         if (elapsed > 60 * 60 * 1000) {
-            // Reiniciar contador
             userDoc.update(
                 mapOf(
                     "lastSearchTimestamp" to now,
@@ -154,61 +153,71 @@ fun checkAndHandleLimit(
             onLimitReached()
         }
     }.addOnFailureListener {
-        onLimitReached() // En caso de fallo, mejor no dejar que abuse
+        onLimitReached()
     }
 }
-
-
 
 @Composable
 fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
     val imageUrl = track.image.lastOrNull()?.url ?: ""
 
-    Column(
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = "Portada del track",
+        Box(
             modifier = Modifier
-                .size(300.dp)
-                .clip(MaterialTheme.shapes.medium)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = track.name,
-            color = Color.White,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 2
-        )
-
-        Text(
-            text = track.artist.name,
-            color = Color(0xFFBBBBBB),
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Button(
-            onClick = { onAddToPlaylist() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
-            ),
-            modifier = Modifier
-                .height(50.dp)
-                .width(220.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = "➕ Agregar a playlist", fontSize = 16.sp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Portada del track",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = track.name,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2
+                )
+
+                Text(
+                    text = track.artist.name,
+                    color = Color(0xFFBBBBBB),
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { onAddToPlaylist() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier
+                        .height(45.dp)
+                        .width(200.dp)
+                ) {
+                    Text(text = "➕ Agregar a playlist", fontSize = 14.sp)
+                }
+            }
         }
     }
 }
