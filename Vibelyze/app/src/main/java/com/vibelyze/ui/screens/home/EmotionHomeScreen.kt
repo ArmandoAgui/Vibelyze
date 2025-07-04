@@ -41,14 +41,8 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
     var showLimitDialog by remember { mutableStateOf(false) }
 
     val emotionTags = mapOf(
-        "😀" to "happy",
-        "😥" to "sad",
-        "😡" to "angry",
-        "😭" to "cry",
-        "😍" to "love",
-        "🤔" to "thinking",
-        "😮" to "surprise",
-        "😴" to "sleep"
+        "😀" to "happy", "😥" to "sad", "😡" to "angry", "😭" to "cry",
+        "😍" to "love", "🤔" to "thinking", "😮" to "surprise", "😴" to "sleep"
     )
 
     Column(
@@ -73,14 +67,14 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
             items(emotionTags.toList()) { (emoji, tag) ->
                 EmotionItem(emoji, tag) {
                     val isPremium = SessionManager.isPremium
+                    val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
 
-                    if (SearchLimiter.canSearch(context, isPremium)) {
+                    if (isPremium || uid == null) {
                         viewModel.fetchTracksForEmotion(tag, apiKey)
-                        if (!isPremium) {
-                            SearchLimiter.recordSearch(context)
-                        }
                     } else {
-                        showLimitDialog = true
+                        checkAndHandleLimit(uid, tag, apiKey, viewModel) {
+                            showLimitDialog = true
+                        }
                     }
                 }
             }
@@ -98,7 +92,6 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
             } ?: Text("No se encontró una canción", color = Color.White)
         }
 
-        // Diálogo si alcanza el límite de búsquedas
         if (showLimitDialog) {
             AlertDialog(
                 onDismissRequest = { showLimitDialog = false },
@@ -123,6 +116,48 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
         }
     }
 }
+
+
+fun checkAndHandleLimit(
+    uid: String,
+    tag: String,
+    apiKey: String,
+    viewModel: EmotionMusicViewModel,
+    onLimitReached: () -> Unit
+) {
+    val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+    val userDoc = db.collection("users").document(uid)
+    val now = System.currentTimeMillis()
+
+    userDoc.get().addOnSuccessListener { snapshot ->
+        val lastTimestamp = snapshot.getLong("lastSearchTimestamp") ?: 0L
+        val searchCount = snapshot.getLong("searchCount")?.toInt() ?: 0
+        val elapsed = now - lastTimestamp
+
+        if (elapsed > 60 * 60 * 1000) {
+            // Reiniciar contador
+            userDoc.update(
+                mapOf(
+                    "lastSearchTimestamp" to now,
+                    "searchCount" to 1
+                )
+            )
+            viewModel.fetchTracksForEmotion(tag, apiKey)
+        } else if (searchCount < 5) {
+            userDoc.update(
+                mapOf(
+                    "searchCount" to searchCount + 1
+                )
+            )
+            viewModel.fetchTracksForEmotion(tag, apiKey)
+        } else {
+            onLimitReached()
+        }
+    }.addOnFailureListener {
+        onLimitReached() // En caso de fallo, mejor no dejar que abuse
+    }
+}
+
 
 
 @Composable

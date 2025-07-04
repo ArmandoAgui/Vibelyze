@@ -3,54 +3,46 @@ package com.vibelyze.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.SystemClock
+import com.google.firebase.firestore.FirebaseFirestore
 
 object SearchLimiter {
-    private const val PREF_NAME = "search_prefs"
-    private const val KEY_LAST_SEARCH_TIME = "last_search_time"
-    private const val KEY_SEARCH_COUNT = "search_count"
-
     private const val MAX_SEARCHES = 5
-    private const val TIME_WINDOW_MS = 60 * 60 * 1000 // 1 hora
+    private const val LIMIT_DURATION_MS = 60 * 60 * 1000 // 1 hora
 
-    fun canSearch(context: Context, isPremium: Boolean): Boolean {
-        if (isPremium) return true
+    fun canSearch(
+        userId: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        val db = FirebaseFirestore.getInstance()
+        val userDoc = db.collection("users").document(userId)
 
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val lastTime = prefs.getLong(KEY_LAST_SEARCH_TIME, 0)
-        val count = prefs.getInt(KEY_SEARCH_COUNT, 0)
+        userDoc.get().addOnSuccessListener { document ->
+            val lastTimestamp = document.getLong("lastSearchTimestamp") ?: 0L
+            val searchCount = document.getLong("searchCount")?.toInt() ?: 0
+            val now = System.currentTimeMillis()
 
-        val now = System.currentTimeMillis()
+            val elapsed = now - lastTimestamp
 
-        return if (now - lastTime > TIME_WINDOW_MS) {
-            resetSearchCount(prefs)
-            true
-        } else {
-            count < MAX_SEARCHES
+            if (elapsed > LIMIT_DURATION_MS) {
+                onResult(true)
+                // Reiniciar contador si ya pasó la hora
+                userDoc.update(
+                    mapOf(
+                        "lastSearchTimestamp" to now,
+                        "searchCount" to 1
+                    )
+                )
+            } else {
+                onResult(searchCount < MAX_SEARCHES)
+                if (searchCount < MAX_SEARCHES) {
+                    userDoc.update(
+                        "searchCount", searchCount + 1
+                    )
+                }
+            }
+        }.addOnFailureListener {
+            onResult(true) // Permitir en caso de fallo
         }
-    }
-
-    fun recordSearch(context: Context) {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val now = System.currentTimeMillis()
-        val lastTime = prefs.getLong(KEY_LAST_SEARCH_TIME, 0)
-        val count = prefs.getInt(KEY_SEARCH_COUNT, 0)
-
-        if (now - lastTime > TIME_WINDOW_MS) {
-            prefs.edit()
-                .putLong(KEY_LAST_SEARCH_TIME, now)
-                .putInt(KEY_SEARCH_COUNT, 1)
-                .apply()
-        } else {
-            prefs.edit()
-                .putInt(KEY_SEARCH_COUNT, count + 1)
-                .apply()
-        }
-    }
-
-    private fun resetSearchCount(prefs: SharedPreferences) {
-        prefs.edit()
-            .putLong(KEY_LAST_SEARCH_TIME, System.currentTimeMillis())
-            .putInt(KEY_SEARCH_COUNT, 0)
-            .apply()
     }
 }
+
