@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.vibelyze.ui.screens.auth.*
 import com.vibelyze.ui.screens.home.EmotionHomeScreen
+import com.vibelyze.ui.components.MainBottomBarScreen
+import com.vibelyze.ui.screens.home.MainScreenWithBottomBar
 
 @Composable
 fun AppNavGraph(
@@ -40,5 +42,24 @@ fun AppNavGraph(
         composable(NavRoutes.Home) {
             EmotionHomeScreen()
         }
+
+        composable(NavRoutes.Home) {
+            MainScreenWithBottomBar()
+        }
+
+        composable(NavRoutes.Emotion) {
+            EmotionHomeScreen()
+        }
+        composable(NavRoutes.Playlists) {
+            // Tu pantalla de Playlists
+
+        }
+        composable(NavRoutes.Profile) {
+            // Tu pantalla de perfil
+
+        }
+
     }
 }
+
+

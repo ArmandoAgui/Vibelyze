@@ -164,54 +164,67 @@ fun checkAndHandleLimit(
 fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
     val imageUrl = track.image.lastOrNull()?.url ?: ""
 
-    Column(
+    Card(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F))
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = "Portada del track",
+        Box(
             modifier = Modifier
-                .size(300.dp)
-                .clip(MaterialTheme.shapes.medium)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = track.name,
-            color = Color.White,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 2
-        )
-
-        Text(
-            text = track.artist.name,
-            color = Color(0xFFBBBBBB),
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Button(
-            onClick = { onAddToPlaylist() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White,
-                contentColor = Color.Black
-            ),
-            modifier = Modifier
-                .height(50.dp)
-                .width(220.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text(text = "➕ Agregar a playlist", fontSize = 16.sp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Portada del track",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = track.name,
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2
+                )
+
+                Text(
+                    text = track.artist.name,
+                    color = Color(0xFFBBBBBB),
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = { onAddToPlaylist() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier
+                        .height(45.dp)
+                        .width(200.dp)
+                ) {
+                    Text(text = "➕ Agregar a playlist", fontSize = 14.sp)
+                }
+            }
         }
     }
 }
+
 
 @Composable
 fun EmotionItem(emoji: String, label: String, onClick: () -> Unit) {

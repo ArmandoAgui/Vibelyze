@@ -4,5 +4,11 @@ object NavRoutes {
     const val Login = "login"
     const val SignUp = "signup"
     const val ConfirmPassword = "confirmPasswordScreen"
-    const val Home = "homeScreen"
+    const val Home = "home" // Contenedor con BottomBar
+
+
+    // Nuevas rutas del BottomBar
+    const val Emotion = "emotion"
+    const val Playlists = "playlists"
+    const val Profile = "profile"
 }

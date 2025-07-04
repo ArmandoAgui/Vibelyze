@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vibelyze.R
 import com.vibelyze.session.SessionManager
+import com.vibelyze.ui.navigation.NavRoutes
 
 @Composable
 fun LoginScreen(
@@ -109,10 +110,11 @@ fun LoginScreen(
 
                                         Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
 
-                                        navController.navigate("homeScreen") {
-                                            popUpTo("signup") { inclusive = true }
+                                        navController.navigate(NavRoutes.Home) {
+                                            popUpTo(NavRoutes.Login) { inclusive = true }
                                             launchSingleTop = true
                                         }
+
                                     }
                                     .addOnFailureListener {
                                         Toast.makeText(context, "No se pudo obtener info del usuario", Toast.LENGTH_SHORT).show()

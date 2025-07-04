@@ -39,7 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
+import com.vibelyze.ui.navigation.NavRoutes
 
 
 @Composable
@@ -106,11 +106,12 @@ fun ConfirmPasswordScreen(
                         .addOnSuccessListener {
                             Handler(Looper.getMainLooper()).post {
                                 Toast.makeText(context, "Cuenta creada exitosamente", Toast.LENGTH_SHORT).show()
-                                navController.navigate("homeScreen") {
-                                    popUpTo("signup") { inclusive = true }
+                                navController.navigate(NavRoutes.Home) {
+                                    popUpTo(NavRoutes.SignUp) { inclusive = true }
                                     launchSingleTop = true
                                 }
-                                    // Aqui borre lo mismo de arriba, vere si funciona sin esto y de paso se lo pondre en LoginScreen
+
+                                // Aqui borre lo mismo de arriba, vere si funciona sin esto y de paso se lo pondre en LoginScreen
                                     //para ver si manda a otra pantalla habiendose logueado
                             }
                         }
