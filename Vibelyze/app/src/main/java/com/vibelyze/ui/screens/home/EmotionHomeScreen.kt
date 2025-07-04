@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +27,7 @@ import com.vibelyze.session.SessionManager
 import com.vibelyze.ui.theme.Purple40
 import com.vibelyze.ui.theme.Purple80
 import com.vibelyze.ui.theme.PurpleGrey40
+import com.vibelyze.utils.SearchLimiter
 import com.vibelyze.viewmodel.EmotionMusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -33,6 +37,8 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
     val tracks by viewModel.tracks
     val isLoading by viewModel.isLoading
     val apiKey = "0ca85b42944c4f03c6bc396e685a3fb3"
+
+    var showLimitDialog by remember { mutableStateOf(false) }
 
     val emotionTags = mapOf(
         "😀" to "happy",
@@ -66,15 +72,15 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
         ) {
             items(emotionTags.toList()) { (emoji, tag) ->
                 EmotionItem(emoji, tag) {
-                    if (SessionManager.canSearch()) {
-                        SessionManager.recordSearch()
+                    val isPremium = SessionManager.isPremium
+
+                    if (SearchLimiter.canSearch(context, isPremium)) {
                         viewModel.fetchTracksForEmotion(tag, apiKey)
+                        if (!isPremium) {
+                            SearchLimiter.recordSearch(context)
+                        }
                     } else {
-                        Toast.makeText(
-                            context,
-                            "Has alcanzado tu límite de 5 búsquedas por hora. ¡Hazte Premium!",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        showLimitDialog = true
                     }
                 }
             }
@@ -91,8 +97,33 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
                 }
             } ?: Text("No se encontró una canción", color = Color.White)
         }
+
+        // Diálogo si alcanza el límite de búsquedas
+        if (showLimitDialog) {
+            AlertDialog(
+                onDismissRequest = { showLimitDialog = false },
+                confirmButton = {
+                    TextButton(onClick = { showLimitDialog = false }) {
+                        Text("Aceptar", color = Color.White)
+                    }
+                },
+                title = {
+                    Text("Límite alcanzado", color = Color.White)
+                },
+                text = {
+                    Text(
+                        "Has alcanzado tu límite de 5 búsquedas por hora. ⏱️\n\nIntenta más tarde o hazte Premium 💎 para búsquedas ilimitadas.",
+                        color = Color.White
+                    )
+                },
+                containerColor = Color(0xFF1F1F1F),
+                titleContentColor = Color.White,
+                textContentColor = Color.White
+            )
+        }
     }
 }
+
 
 @Composable
 fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
