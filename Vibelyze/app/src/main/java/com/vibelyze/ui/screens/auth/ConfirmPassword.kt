@@ -97,7 +97,8 @@ fun ConfirmPasswordScreen(
                     val userMap = mapOf(
                         "name" to viewModel.name,
                         "birthDate" to viewModel.birthDate,
-                        "email" to viewModel.email
+                        "email" to viewModel.email,
+                        "isPremium" to false // 👈 Campo agregado aquí
                     )
 
                     firestore.collection("users").document(uid)
@@ -115,6 +116,7 @@ fun ConfirmPasswordScreen(
                         }
                         .addOnFailureListener { e ->
                             errorMessage = "Error guardando datos: ${e.message}"
+                            Toast.makeText(context, "Error Firestore: ${e.message}", Toast.LENGTH_LONG).show()
                         }
 
                 } else {
