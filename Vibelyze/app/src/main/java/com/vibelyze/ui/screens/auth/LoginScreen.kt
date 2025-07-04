@@ -6,32 +6,21 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material3.TextFieldDefaults
-import com.vibelyze.R
-import androidx.compose.material3.*
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.firestore.FirebaseFirestore
+import com.vibelyze.R
+import com.vibelyze.session.SessionManager
 
 @Composable
 fun LoginScreen(
@@ -43,11 +32,12 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF001F4D)) // Fondo azul marino
+            .background(Color(0xFF001F4D))
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -92,7 +82,7 @@ fun LoginScreen(
                 label = { Text("Contraseña", color = Color.White) },
                 textStyle = LocalTextStyle.current.copy(color = Color.White),
                 modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(), // hacer commit de esto pero verificar si funciona
+                visualTransformation = PasswordVisualTransformation(),
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color(0xFF1F1F1F),
                     unfocusedContainerColor = Color(0xFF1F1F1F),
@@ -104,20 +94,29 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            val context = LocalContext.current
-            val auth = FirebaseAuth.getInstance()
-
             Button(
                 onClick = {
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
-                                Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
-                                //onLoginClick() // Aquí navegas a la siguiente pantalla si el login fue exitoso
-                                navController.navigate("homeScreen") {
-                                    popUpTo("signup") { inclusive = true }
-                                    launchSingleTop = true
-                                }
+                                val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+
+                                firestore.collection("users").document(uid)
+                                    .get()
+                                    .addOnSuccessListener { document ->
+                                        val isPremium = document.getBoolean("isPremium") ?: false
+                                        SessionManager.isPremium = isPremium
+
+                                        Toast.makeText(context, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show()
+
+                                        navController.navigate("homeScreen") {
+                                            popUpTo("signup") { inclusive = true }
+                                            launchSingleTop = true
+                                        }
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(context, "No se pudo obtener info del usuario", Toast.LENGTH_SHORT).show()
+                                    }
                             } else {
                                 Toast.makeText(context, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                             }

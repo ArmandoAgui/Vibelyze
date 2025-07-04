@@ -1,9 +1,9 @@
 package com.vibelyze.ui.screens.home
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -14,24 +14,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.vibelyze.data.model.lastfm.Track
+import com.vibelyze.session.SessionManager
 import com.vibelyze.ui.theme.Purple40
 import com.vibelyze.ui.theme.Purple80
 import com.vibelyze.ui.theme.PurpleGrey40
-import com.vibelyze.ui.theme.VibelyzeTheme
 import com.vibelyze.viewmodel.EmotionMusicViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
+    val context = LocalContext.current
     val tracks by viewModel.tracks
     val isLoading by viewModel.isLoading
-    val apiKey = "0ca85b42944c4f03c6bc396e685a3fb3" // ⬅️ REEMPLAZA con tu key real
+    val apiKey = "0ca85b42944c4f03c6bc396e685a3fb3"
 
     val emotionTags = mapOf(
         "😀" to "happy",
@@ -65,8 +66,16 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
         ) {
             items(emotionTags.toList()) { (emoji, tag) ->
                 EmotionItem(emoji, tag) {
-                    println("🎯 Tag seleccionado: $tag")
-                    viewModel.fetchTracksForEmotion(tag, apiKey)
+                    if (SessionManager.canSearch()) {
+                        SessionManager.recordSearch()
+                        viewModel.fetchTracksForEmotion(tag, apiKey)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Has alcanzado tu límite de 5 búsquedas por hora. ¡Hazte Premium!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -78,14 +87,13 @@ fun EmotionHomeScreen(viewModel: EmotionMusicViewModel = viewModel()) {
         } else {
             tracks.firstOrNull()?.let { track ->
                 MusicPlayerCard(track) {
-                    // Aquí puedes agregar lógica para guardar en Firestore
                     println("🎵 Agregado a la playlist: ${track.name} - ${track.artist.name}")
                 }
-
             } ?: Text("No se encontró una canción", color = Color.White)
         }
     }
 }
+
 @Composable
 fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
     val imageUrl = track.image.lastOrNull()?.url ?: ""
@@ -97,7 +105,6 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Imagen grande del álbum
         AsyncImage(
             model = imageUrl,
             contentDescription = "Portada del track",
@@ -108,7 +115,6 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Título de la canción
         Text(
             text = track.name,
             color = Color.White,
@@ -117,7 +123,6 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
             maxLines = 2
         )
 
-        // Nombre del artista
         Text(
             text = track.artist.name,
             color = Color(0xFFBBBBBB),
@@ -127,7 +132,6 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Botón elegante para agregar
         Button(
             onClick = { onAddToPlaylist() },
             colors = ButtonDefaults.buttonColors(
@@ -142,7 +146,6 @@ fun MusicPlayerCard(track: Track, onAddToPlaylist: () -> Unit) {
         }
     }
 }
-
 
 @Composable
 fun EmotionItem(emoji: String, label: String, onClick: () -> Unit) {
@@ -168,4 +171,3 @@ fun EmotionItem(emoji: String, label: String, onClick: () -> Unit) {
         Text(text = label, fontSize = 14.sp, color = Color.White)
     }
 }
-
